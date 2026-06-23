@@ -1,0 +1,4 @@
+seed.sql
+build/
+tmp/
+.air/
