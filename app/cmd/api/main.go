@@ -11,6 +11,28 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+func setupRouter(queries *db.Queries) *gin.Engine {
+	router := gin.Default()
+
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"health": "ok"})
+	})
+
+	expgrp := router.Group("/expenses", CORSMiddleware())
+
+	expgrp.GET("/", getExpenses(queries))
+	expgrp.GET("/:id", getExpenseByID(queries))
+	expgrp.POST("/", createExpense(queries))
+
+	usrgrp := router.Group("/users", CORSMiddleware())
+
+	usrgrp.GET("/", getUsers(queries))
+
+	admgrp := router.Group("/admin", CORSMiddleware())
+
+	return router
+}
+
 func main() {
 	ctx := context.Background()
 
@@ -23,13 +45,9 @@ func main() {
 
 	queries := db.New(pool)
 
-	route := gin.Default()
+	r := setupRouter(queries)
 
-	route.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"health": "ok"})
-	})
-
-	err = route.Run(":8000")
+	err = r.Run(":8000")
 	if err != nil {
 		log.Fatal("server couldn't start!")
 	}
