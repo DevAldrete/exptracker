@@ -2,3 +2,4 @@ seed.sql
 build/
 tmp/
 .air/
+.env

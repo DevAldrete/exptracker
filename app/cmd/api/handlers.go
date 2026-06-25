@@ -125,6 +125,54 @@ func createExpense(queries *db.Queries) gin.HandlerFunc {
 	}
 }
 
+func updateExpenseByID(queries *db.Queries) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(c.Request.Context(), TIMEOUT)
+		defer cancel()
+
+		idRaw := c.Param("id")
+
+		id, err := strconv.Atoi(idRaw)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		req := db.UpdateExpenseByIdParams{
+			ID: int64(id),
+		}
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		res, err := queries.UpdateExpenseById(ctx, req)
+		if err != nil {
+			c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		}
+
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+func deleteExpenseByID(queries *db.Queries) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(c.Request.Context(), TIMEOUT)
+		defer cancel()
+
+		req := c.Param("id")
+		id, err := strconv.Atoi(req)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		if err := queries.DeleteExpenseById(ctx, int64(id)); err != nil {
+			c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		}
+
+		c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
+	}
+}
+
 // Users
 
 func getUsers(queries *db.Queries) gin.HandlerFunc {
@@ -277,6 +325,6 @@ func deleteUserByID(queries *db.Queries) gin.HandlerFunc {
 			c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
 		}
 
-		c.JSON(http.StatusNotFound, gin.H{"status": "success"})
+		c.JSON(http.StatusNotFound, gin.H{"status": "not found"})
 	}
 }

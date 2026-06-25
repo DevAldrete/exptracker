@@ -29,7 +29,8 @@ type CreateExpenseParams struct {
 }
 
 func (q *Queries) CreateExpense(ctx context.Context, arg CreateExpenseParams) (Expense, error) {
-	row := q.db.QueryRow(ctx, createExpense,
+	row := q.db.QueryRow(
+		ctx, createExpense,
 		arg.Name,
 		arg.Description,
 		arg.Cents,
@@ -480,7 +481,8 @@ type UpdateExpenseByIdParams struct {
 }
 
 func (q *Queries) UpdateExpenseById(ctx context.Context, arg UpdateExpenseByIdParams) (Expense, error) {
-	row := q.db.QueryRow(ctx, updateExpenseById,
+	row := q.db.QueryRow(
+		ctx, updateExpenseById,
 		arg.ID,
 		arg.Name,
 		arg.Description,
@@ -515,7 +517,8 @@ type UpdateUserByIdParams struct {
 }
 
 func (q *Queries) UpdateUserById(ctx context.Context, arg UpdateUserByIdParams) (User, error) {
-	row := q.db.QueryRow(ctx, updateUserById,
+	row := q.db.QueryRow(
+		ctx, updateUserById,
 		arg.ID,
 		arg.Name,
 		arg.Email,
